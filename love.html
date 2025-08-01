@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>💖Happy International Girlfriend Day💖</title>
+  <style>
+    body {
+      margin: 0;
+      height: 100vh;
+      background: linear-gradient(to right, #ffe0f0, #ffcfe9);
+      font-family: 'Segoe UI', sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      overflow: hidden;
+    }
+
+    .scene {
+      width: 250px;
+      height: 250px;
+      perspective: 1000px;
+      z-index: 2;
+    }
+
+    .cube {
+      width: 100%;
+      height: 100%;
+      position: relative;
+      transform-style: preserve-3d;
+      transition: transform 0.5s ease;
+      cursor: grab;
+    }
+
+    .face {
+      position: absolute;
+      width: 250px;
+      height: 250px;
+      background-size: cover;
+      background-position: center;
+      border: 3px solid #fff;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    }
+
+    .front  { transform: rotateY(0deg) translateZ(125px);  background-image: url('https://raw.githubusercontent.com/hazz17/hazz17/refs/heads/main/photo_2025-08-01_06-39-23.jpg'); }
+    .back   { transform: rotateY(180deg) translateZ(125px); background-image: url('https://raw.githubusercontent.com/hazz17/hazz17/refs/heads/main/photo_2025-08-01_06-41-00.jpg'); }
+    .right  { transform: rotateY(90deg) translateZ(125px);  background-image: url('https://raw.githubusercontent.com/hazz17/hazz17/refs/heads/main/photo_2025-08-01_06-43-21.jpg'); }
+    .left   { transform: rotateY(-90deg) translateZ(125px); background-image: url('https://raw.githubusercontent.com/hazz17/hazz17/refs/heads/main/photo_2025-08-01_06-43-50.jpg'); }
+
+    #love-letter-btn {
+      position: absolute;
+      bottom: 100px;
+      background: #ffb6c1;
+      padding: 12px 24px;
+      border: none;
+      border-radius: 20px;
+      font-size: 16px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+      cursor: pointer;
+      z-index: 3;
+      transition: all 0.3s;
+    }
+
+    #love-letter-btn:hover {
+      background: #ff91af;
+    }
+
+    .message {
+      position: absolute;
+      bottom: 40px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #fff0f6;
+      padding: 20px;
+      border-radius: 10px;
+      font-size: 18px;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+      text-align: center;
+      width: 80%;
+      display: none;
+      z-index: 3;
+    }
+
+    canvas#fireworks {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    .bubble {
+      position: absolute;
+      width: 20px;
+      height: 20px;
+      background: pink;
+      border-radius: 50%;
+      animation: floatUp 5s infinite ease-in;
+      opacity: 0.6;
+    }
+
+    @keyframes floatUp {
+      from { transform: translateY(100vh); opacity: 0.8; }
+      to { transform: translateY(-10vh); opacity: 0; }
+    }
+
+    #rotate-note {
+      position: absolute;
+      top: 20px;
+      font-size: 18px;
+      color: #ff69b4;
+      background: #fff0f5;
+      padding: 10px 20px;
+      border-radius: 20px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+      animation: pulse 2s infinite;
+      z-index: 4;
+    }
+
+    @keyframes pulse {
+      0% { transform: scale(1); opacity: 1; }
+      50% { transform: scale(1.05); opacity: 0.8; }
+      100% { transform: scale(1); opacity: 1; }
+    }
+
+    audio {
+      display: none;
+    }
+  </style>
+</head>
+<body>
+
+<canvas id="fireworks"></canvas>
+
+<div class="scene">
+  <div class="cube" id="cube">
+    <div class="face front"></div>
+    <div class="face back"></div>
+    <div class="face right"></div>
+    <div class="face left"></div>
+  </div>
+</div>
+
+<div id="rotate-note">🌈 Rotate the cube to explore love!</div>
+
+<button id="love-letter-btn">💌 Tap to Read My Heart</button>
+<div class="message" id="message">You're Pretty, You're Cute. I Love Youuuu 💌</div>
+
+<audio id="bg-music" loop>
+  <source src="https://raw.githubusercontent.com/hazz17/hazz17/refs/heads/main/lagu_sah.mp3" type="audio/mpeg">
+</audio>
+
+<script>
+  const cube = document.getElementById('cube');
+  const message = document.getElementById('message');
+  const music = document.getElementById('bg-music');
+  const letterBtn = document.getElementById('love-letter-btn');
+  const canvas = document.getElementById('fireworks');
+  const ctx = canvas.getContext('2d');
+
+  // Cube rotation logic
+  let isDragging = false;
+  let startX, startY;
+  let rotateX = 0, rotateY = 0;
+
+  // Mouse support
+  cube.addEventListener('mousedown', (e) => {
+    isDragging = true;
+    startX = e.clientX;
+    startY = e.clientY;
+    cube.style.cursor = 'grabbing';
+  });
+
+  document.addEventListener('mouseup', () => {
+    isDragging = false;
+    cube.style.cursor = 'grab';
+  });
+
+  document.addEventListener('mousemove', (e) => {
+    if (!isDragging) return;
+    const deltaX = e.clientX - startX;
+    const deltaY = e.clientY - startY;
+    rotateY += deltaX * 0.5;
+    rotateX -= deltaY * 0.5;
+    cube.style.transform = `rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
+    startX = e.clientX;
+    startY = e.clientY;
+  });
+
+  // ✅ Touch support
+  cube.addEventListener('touchstart', (e) => {
+    isDragging = true;
+    startX = e.touches[0].clientX;
+    startY = e.touches[0].clientY;
+  }, { passive: true });
+
+  document.addEventListener('touchend', () => {
+    isDragging = false;
+  });
+
+  document.addEventListener('touchmove', (e) => {
+    if (!isDragging) return;
+    const touch = e.touches[0];
+    const deltaX = touch.clientX - startX;
+    const deltaY = touch.clientY - startY;
+    rotateY += deltaX * 0.5;
+    rotateX -= deltaY * 0.5;
+    cube.style.transform = `rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
+    startX = touch.clientX;
+    startY = touch.clientY;
+  }, { passive: true });
+
+  // Letter click
+  letterBtn.addEventListener('click', () => {
+    message.style.display = 'block';
+    letterBtn.style.display = 'none';
+    music.play().catch(e => console.log("Music autoplay blocked:", e));
+    startFireworks();
+    createBubbles();
+  });
+
+  // Fireworks
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+
+  function startFireworks() {
+    const particles = [];
+
+    function createParticle() {
+      const x = Math.random() * canvas.width;
+      const y = Math.random() * canvas.height / 2;
+      const radius = Math.random() * 2 + 1;
+      const color = `hsl(${Math.random() * 360}, 100%, 70%)`;
+      const dx = (Math.random() - 0.5) * 4;
+      const dy = (Math.random() - 0.5) * 4;
+      particles.push({x, y, radius, color, dx, dy});
+    }
+
+    function animateParticles() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      particles.forEach((p, i) => {
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+        ctx.fillStyle = p.color;
+        ctx.fill();
+        p.x += p.dx;
+        p.y += p.dy;
+        p.radius *= 0.96;
+        if (p.radius < 0.5) particles.splice(i, 1);
+      });
+
+      if (Math.random() < 0.2) for (let i = 0; i < 10; i++) createParticle();
+      requestAnimationFrame(animateParticles);
+    }
+
+    animateParticles();
+  }
+
+  // Floating bubbles
+  function createBubbles() {
+    setInterval(() => {
+      const bubble = document.createElement('div');
+      bubble.classList.add('bubble');
+      bubble.style.left = Math.random() * 100 + 'vw';
+      bubble.style.width = bubble.style.height = Math.random() * 30 + 10 + 'px';
+      bubble.style.background = 'rgba(255,105,180,0.6)';
+      document.body.appendChild(bubble);
+      setTimeout(() => bubble.remove(), 6000);
+    }, 300);
+  }
+</script>
+
+</body>
+</html>
